@@ -1,5 +1,3 @@
-require '../Util/File_reader'
-
 class ErbTagsRemover
 
   def remove_erb_tags(text)
@@ -12,8 +10,6 @@ class ErbTagsRemover
         end
       end
     end
-    code = matchdata.join("\n")
+    matchdata.join("\n")
   end
 end
-
-#ErbTagsRemover.new.remove_erb_tags(FileReader.new.read_file("C:/Users/jpms2/Desktop/TAn/sample.html.erb"))
