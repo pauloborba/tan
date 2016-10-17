@@ -6,4 +6,3 @@ gem "rails"
 gem 'rspec'
 gem 'parser'
 gem 'ast'
-gem 'rake'
