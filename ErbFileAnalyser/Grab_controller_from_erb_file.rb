@@ -1,10 +1,10 @@
 class ControllerGrabber
 
-  require '../ErbFileAnalyser/Erb_tags_remover'
-  require '../Visitors/method_controller_visitor'
-  require '../Util/file_manager'
-  require '../Util/ruby_parser'
-  require '../Util/output_model'
+  require_relative '../ErbFileAnalyser/Erb_tags_remover'
+  require_relative '../Visitors/method_controller_visitor'
+  require_relative '../Util/file_manager'
+  require_relative '../Util/ruby_parser'
+  require_relative '../Util/output_model'
   require 'ast/node'
 
   def grab_controllers(file_path)
@@ -20,5 +20,3 @@ class ControllerGrabber
   end
 
 end
-
-ControllerGrabber.new.grab_controllers("C:/Users/jpms2/Desktop/TAn/otml_files/sample.html.erb")
