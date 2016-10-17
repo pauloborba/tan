@@ -122,6 +122,7 @@ PLATFORMS
 
 DEPENDENCIES
   ast
+  nokogiri
   parser
   rails
   rspec
