@@ -3,8 +3,7 @@ source "https://rubygems.org"
 
 # 
 gem "rails"
-
-gem 'rspec' :require => 'spec'
+gem 'rspec'
 gem 'parser'
 gem 'ast'
 gem 'rake'
