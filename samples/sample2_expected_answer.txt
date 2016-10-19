@@ -1,0 +1,5 @@
+[name: Inicio, type: root_path]
+[name: Producto, type: productos_index_path]
+[name: Venta, type: venta_index_path]
+[name: Proveedor, type: proveedor_index_path]
+[name: Clientes, type: cliente_index_path]

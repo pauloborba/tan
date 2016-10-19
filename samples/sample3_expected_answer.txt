@@ -1,0 +1,2 @@
+[name: Show, type: @otml_category]
+[name: Back, type: otml_categories_path]

@@ -12,7 +12,7 @@ describe 'Get ruby code' do
       erb_tags_remover = ErbTagsRemover.new
       while i < 20 do
         untagged_code = erb_tags_remover.remove_erb_tags("#{path}/samples/sample#{i}.html.erb")
-        i = i + 1
+        i += 1
         begin
           ruby_parser = Ruby_parser.new
           ruby_parser.parse_code(untagged_code)

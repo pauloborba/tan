@@ -18,7 +18,14 @@ class File_manager
   end
 
   def write_on_file(text, path)
-    File.open(path + ".txt", 'w') { |file| file.write(text) }
+    File.open(path + '.txt', 'w') do |f|
+      f.write text
+    end
+  end
+
+  def get_file_name(file_path)
+    name_with_extension = /(?!.*\/)(.*)$/.match(file_path).to_s
+    name = /.*(?=\.)/.match(name_with_extension).to_s
   end
 
 end
