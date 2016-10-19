@@ -1,2 +1,0 @@
-[name: Show, type: @otml_file]
-[name: Back, type: otml_files_path]
