@@ -29,5 +29,3 @@ class ControllerGrabber
   end
 
 end
-
-ControllerGrabber.new.grab_controllers('C:/Users/jpms2/Desktop/TAn/samples/sample2.html.erb')
