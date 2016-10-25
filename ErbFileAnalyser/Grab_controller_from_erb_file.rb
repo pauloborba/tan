@@ -4,7 +4,7 @@
 class ControllerGrabber
 
   require_relative '../ErbFileAnalyser/Erb_tags_remover'
-  require_relative '../Visitors/method_controller_visitor'
+  require_relative '../ErbFileAnalyser/find_controller_calls'
   require_relative '../Util/file_manager'
   require_relative '../Util/ruby_parser'
   require_relative '../Util/output_model'
@@ -16,16 +16,13 @@ class ControllerGrabber
     file_text = file_manager.read_file(file_path)
     code = ErbTagsRemover.new.remove_erb_tags(file_text)
     parsed_code = Ruby_parser.new.parse_code(code)
-    output_array = Method_controller_visitor.new([]).find_controllers(parsed_code)
+    output_array = Find_controller_calls.new([],"","").find_controllers(parsed_code)
     output_array.each do |output|
-      output_value = output_value + "[name: #{output.name}, type: #{output.type}]\n"
+      output_value = output_value + "[name: '#{output.name}', receiver: '#{output.receiver}']\n"
     end
-    file_manager.create_file("#{get_relative_path}/outputs/#{file_manager.get_file_name(file_path)}_output", 'txt')
-    file_manager.write_on_file(output_value, "#{get_relative_path}/outputs/#{file_manager.get_file_name(file_path)}_output")
-  end
-
-  def get_relative_path
-    File.dirname(__dir__)
+    path = "#{File.dirname(__dir__)}/outputs/#{file_manager.get_file_name(file_path)}_output"
+    file_manager.create_file(path, 'txt')
+    file_manager.write_on_file(output_value, path)
   end
 
 end

@@ -18,7 +18,7 @@ class File_manager
   end
 
   def write_on_file(text, path)
-    File.open(path + '.txt', 'w') do |f|
+    File.open(path, 'w') do |f|
       f.write text
     end
   end

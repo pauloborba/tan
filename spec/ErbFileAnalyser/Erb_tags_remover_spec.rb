@@ -2,9 +2,8 @@ require 'rspec'
 require_relative '../../ErbFileAnalyser/Erb_tags_remover'
 require_relative '../../Util/ruby_parser'
 
-describe 'Get ruby code' do
-  context "by transforming erb tagged code into pure ruby" do
-    it 'so it should make the code possible to parse' do
+describe 'Erb tags removal function' do
+    it 'does not break for the files in the samples directory' do
       $a = true
       hard_path = __FILE__
       path = hard_path.scan(/.*(?=\/)/)
@@ -22,5 +21,4 @@ describe 'Get ruby code' do
       end
       expect($a).to eq true
     end
-  end
 end

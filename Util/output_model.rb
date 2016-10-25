@@ -1,6 +1,6 @@
 class Output_model
 
   attr_accessor :name
-  attr_accessor :type
+  attr_accessor :receiver
 
 end
