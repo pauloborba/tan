@@ -8,6 +8,11 @@ class ErbTagsRemover
       tagged_chunks.each do |tagged_chunk|
         if tagged_chunk[0] == '='
          tagged_chunk.slice!(0)
+        elsif tagged_chunk[-1] == '-'
+          tagged_chunk.slice!(-1)
+        end
+        if tagged_chunk[0] == '#'
+          tagged_chunks - [tagged_chunk]
         end
       end
     end
