@@ -1,0 +1,5 @@
+[name: 'uuid', receiver: '@otml_category']
+[name: 'name', receiver: '@otml_category']
+[name: 'update', receiver: '@otml_categories_controller']
+[name: 'otml_category_path', receiver: '']
+[name: 'otml_categories_path', receiver: '']

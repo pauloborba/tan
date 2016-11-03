@@ -1,0 +1,5 @@
+[name:'root_path', receiver:'']
+[name:'productos_index_path', receiver:'']
+[name:'venta_index_path', receiver:'']
+[name:'proveedor_index_path', receiver:'']
+[name:'cliente_index_path', receiver:'']
