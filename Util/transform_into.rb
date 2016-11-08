@@ -3,10 +3,14 @@ require 'active_support/inflector'
 class Transform_into
 
   def self.var_into_controller(var)
-    if var[-1] == 'y'
-      var = "#{var[0...-1]}ies_controller"
+    if var == ''
+
     else
-      var = "#{var}s_controller"
+      if var[-1] == 'y'
+        var = "#{var[0...-1]}ies_controller"
+      else
+        var = "#{var}s_controller"
+      end
     end
   end
 

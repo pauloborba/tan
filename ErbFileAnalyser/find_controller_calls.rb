@@ -22,15 +22,20 @@ class Find_controller_calls
   $confirm = :confirm
   $block = :block
   $send = :send
+  $render = :render
+  $form_tag = :form_tag
 
   def find_controllers(code)
-    instance_variable = look_for_instance_variable(code)
-    lvar_derived_from_ivar = look_for_loop_argument(code)
+    look_for_instance_variable(code)
+    look_for_loop_argument(code)
     code.children.each do |code_children|
-      if !(code_children.is_a?(Symbol) || code_children.is_a?(NilClass) || code_children.is_a?(String))
+      if is_still_a_node(code_children)
         look_for_link_to_calls(code_children)
-        look_for_submit_calls(code_children, instance_variable)
-        look_for_auto_gen_methods(code_children,instance_variable,lvar_derived_from_ivar)
+        look_for_submit_calls(code_children, $instance_variable)
+        look_for_auto_gen_methods(code_children,$instance_variable,$lvar_derived_from_ivar)
+        look_for_form_for_action(code_children,$instance_variable)
+        look_for_render_call(code_children,$instance_variable)
+        look_for_form_tag_call(code_children, $instance_variable)
         find_controllers(code_children)
       end
     end
@@ -69,7 +74,14 @@ end
 def look_for_submit_calls(code, instance_variable)
   method_name = code.children[1]
   if method_name == $submit
-    method_argument = code.children[2].children[0]
+    method_argument_type = code.children[2].type
+    if method_argument_type == $str
+      method_argument = code.children[2].children[0]
+    else
+      if method_argument_type == $send
+        method_argument = code.children[3].children[0].children[1].children[0]
+      end
+    end
     insert_outputs_on_array("#{method_argument}".downcase,Transform_into.var_into_controller(instance_variable))
   end
 end
@@ -78,14 +90,20 @@ def look_for_auto_gen_methods(code, instance_variable,lvar_derived_from_ivar)
   method_name = code.children[1]
   if method_name == $label
     method_argument_value = code.children[2].children[0]
-    insert_outputs_on_array(method_argument_value, instance_variable)
+    if method_argument_value.is_a?(Parser::AST::Node)
+      method_argument_value = code.children[2].children[0].children[0].children[2].children[0]
+      insert_outputs_on_array(method_argument_value, instance_variable)
+    else
+      insert_outputs_on_array(method_argument_value, instance_variable)
+    end
   end
-  if !(code.children[0].is_a?(Symbol) || code.children[0].is_a?(NilClass) || code.children[0].is_a?(String))
+  if is_still_a_node(code.children[0])
     variable_type = code.children[0].type
     variable_calls_method = !code.children[1].nil?
     if variable_type == $lvar && variable_calls_method
       method_argument = code.children[0].children[0]
       if method_argument == lvar_derived_from_ivar
+        puts code
         insert_outputs_on_array(method_name, instance_variable)
       end
     end
@@ -95,7 +113,7 @@ end
 def look_for_loop_argument(code)
   if $lvar_derived_from_ivar == ""
     code.children.each do |code_children|
-      if !(code_children.is_a?(Symbol) || code_children.is_a?(NilClass) || code_children.is_a?(String))
+      if is_still_a_node(code_children)
         if code_children.type == $block
           if code_children.children[0].type == $send
             loop_type = code_children.children[0].children[1]
@@ -116,20 +134,25 @@ end
 def look_for_instance_variable(code)
   if $instance_variable == ""
     code.children.each do |code_children|
-      if !(code_children.is_a?(Symbol) || code_children.is_a?(NilClass) || code_children.is_a?(String))
+      if is_still_a_node(code_children)
         loop_type = code_children.children[1]
         if loop_type == $form_for && code_children.children[2].type == $ivar
           loop_variable_value = code_children.children[2].children[0]
           $instance_variable = loop_variable_value
         elsif  loop_type == $each
           loop_variable_value = code_children.children[0].children[0]
-          $instance_variable = loop_variable_value
+          if loop_variable_value.is_a?(String)
+            if loop_variable_value[0] == '@'
+              $instance_variable = loop_variable_value
+            end
+          end
         end
         look_for_instance_variable(code_children)
       end
     end
   else
     Transform_into.singular("#{$instance_variable}")
+    puts $instance_variable
   end
 end
 
@@ -144,6 +167,56 @@ def look_for_confirm_call(code)
       insert_outputs_on_array("#{link_to_redirect_name}".downcase,Transform_into.var_into_controller(link_to_argument_variable))
       true
     end
+  else
+    false
+  end
+end
+
+def look_for_form_for_action(code, instance_variable)
+  if is_still_a_node(code)
+    if code.type == $send
+      loop_type = code.children[1]
+      if loop_type == $form_for
+        has_hash = !code.children[3].nil?
+        if has_hash
+          possible_hash = code.children[3].children[1].children[1].type
+          if possible_hash == $hash
+            loop_action = code.children[3].children[1].children[1].children[1].children[1].children[0]
+            insert_outputs_on_array(loop_action, instance_variable)
+          end
+        end
+      end
+    end
+  end
+end
+
+def look_for_render_call(code, instance_variable)
+  method_name = code.children[1]
+  if method_name == $render
+    method_argument = code.children[2].children[0]
+    insert_outputs_on_array(method_argument, instance_variable)
+  end
+end
+
+def look_for_form_tag_call(code, instance_variable)
+  method_name = code.children[1]
+  if method_name == $form_tag
+    possible_hash = code.children[2].type
+    if possible_hash == $hash
+      method_argument = code.children[2].children[1].children[1].children[0]
+      controller_called = code.children[2].children[0].children[1].children[0]
+      insert_outputs_on_array(method_argument, controller_called)
+    else
+      method_argument = code.children[2].children[1]
+      insert_outputs_on_array(method_argument, instance_variable)
+    end
+
+  end
+end
+
+def is_still_a_node(code)
+  if code.is_a?(Parser::AST::Node)
+    true
   else
     false
   end
