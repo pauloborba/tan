@@ -103,7 +103,6 @@ def look_for_auto_gen_methods(code, instance_variable,lvar_derived_from_ivar)
     if variable_type == $lvar && variable_calls_method
       method_argument = code.children[0].children[0]
       if method_argument == lvar_derived_from_ivar
-        puts code
         insert_outputs_on_array(method_name, instance_variable)
       end
     end
@@ -141,18 +140,15 @@ def look_for_instance_variable(code)
           $instance_variable = loop_variable_value
         elsif  loop_type == $each
           loop_variable_value = code_children.children[0].children[0]
-          if loop_variable_value.is_a?(String)
-            if loop_variable_value[0] == '@'
+          if loop_variable_value.to_s[0] == '@'
               $instance_variable = loop_variable_value
-            end
           end
         end
         look_for_instance_variable(code_children)
       end
     end
   else
-    Transform_into.singular("#{$instance_variable}")
-    puts $instance_variable
+    $instance_variable = Transform_into.singular("#{$instance_variable}")
   end
 end
 
