@@ -24,7 +24,7 @@ class File_manager
   end
 
   def get_file_name(file_path)
-    name_with_extension = /(?!.*\/)(.*)$/.match(file_path).to_s
+    name_with_extension = /(?!.*\\)(.*)$/.match(file_path).to_s
     name = /.*(?=\.)/.match(name_with_extension).to_s
   end
 
