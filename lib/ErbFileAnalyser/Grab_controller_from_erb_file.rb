@@ -20,10 +20,9 @@ class ControllerGrabber
     output_array.each do |output|
       output_value = output_value + "[name: '#{output.name}', receiver: '#{output.receiver}']\n"
     end
-    path = "#{File.dirname(__dir__)}/outputs/#{file_manager.get_file_name(file_path)}_output"
-    puts File.dirname(__dir__)
-    file_manager.create_file(path, 'txt')
-    file_manager.write_on_file(output_value, path)
+    puts output_value
   end
 
 end
+
+ControllerGrabber.new.grab_controllers 'C:/Users/jpms2/Desktop/tanGem/TAn/samples/sample20.html.erb'

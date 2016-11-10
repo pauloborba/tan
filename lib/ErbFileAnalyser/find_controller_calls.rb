@@ -175,11 +175,19 @@ def look_for_form_for_action(code, instance_variable)
       if loop_type == $form_for
         has_hash = !code.children[3].nil?
         if has_hash
-          possible_hash = code.children[3].children[1].children[1].type
-          if possible_hash == $hash
-            loop_action = code.children[3].children[1].children[1].children[1].children[1].children[0]
-            insert_outputs_on_array(loop_action, instance_variable)
+          hash_implementation1 = code.children[3].children[1].nil?
+          if hash_implementation1
+            possible_hash = code.children[3].children[0].children[1].type
+            if possible_hash == $hash
+              loop_action = code.children[3].children[0].children[1].children[0].children[1].children[0]
+            end
+          else
+            possible_hash = code.children[3].children[1].children[1].type
+            if possible_hash == $hash
+              loop_action = code.children[3].children[1].children[1].children[1].children[1].children[0]
+            end
           end
+          insert_outputs_on_array(loop_action, instance_variable)
         end
       end
     end
