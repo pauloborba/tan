@@ -3,7 +3,7 @@ $:.unshift lib unless $:.include?(lib)
 
 Gem::Specification.new do |s|
   s.name        = 'erb_dependencies'
-  s.version     = '0.0.0'
+  s.version     = '0.0.1'
   s.date        = '2016-11-10'
   s.summary     = "erb_dependencies"
   s.description = "Tool made for finding possible controller calls inside .erb views"

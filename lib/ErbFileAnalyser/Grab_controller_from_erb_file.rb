@@ -20,9 +20,7 @@ class ControllerGrabber
     output_array.each do |output|
       output_value = output_value + "[name: '#{output.name}', receiver: '#{output.receiver}']\n"
     end
-    puts output_value
+    output_value
   end
 
 end
-
-ControllerGrabber.new.grab_controllers 'C:/Users/jpms2/Desktop/tanGem/TAn/samples/sample20.html.erb'
