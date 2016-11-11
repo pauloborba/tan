@@ -24,6 +24,7 @@ class Find_controller_calls
   $send = :send
   $render = :render
   $form_tag = :form_tag
+  $pair = :pair
 
   def find_controllers(code)
     if is_still_a_node(code)
@@ -56,6 +57,7 @@ class Find_controller_calls
 end
 
 def look_for_link_to_calls(code)
+  controller_name = ''
   method_name = code.children[1]
   if method_name == $link_to
     found_confirm_call = look_for_confirm_call(code)
@@ -68,7 +70,14 @@ def look_for_link_to_calls(code)
         method_inside_link_to_has_params = code.children[3].children[1].nil?
         if !method_inside_link_to_has_params
           method_inside_link_to_param = code.children[3].children[1]
-          insert_outputs_on_array(method_inside_link_to_param, "")
+          if is_still_a_node(method_inside_link_to_param)
+            if method_inside_link_to_param.type == $pair
+              method_inside_link_to_param = code.children[3].children[1].children[1].children[0]
+              controller_name = code.children[3].children[0].children[1].children[0]
+              puts method_inside_link_to_param
+            end
+          end
+          insert_outputs_on_array(method_inside_link_to_param, Transform_into.singular(controller_name))
         end
       end
     end
