@@ -26,20 +26,24 @@ class Find_controller_calls
   $form_tag = :form_tag
 
   def find_controllers(code)
-    look_for_instance_variable(code)
-    look_for_loop_argument(code)
-    code.children.each do |code_children|
-      if is_still_a_node(code_children)
-        look_for_link_to_calls(code_children)
-        look_for_submit_calls(code_children, $instance_variable)
-        look_for_auto_gen_methods(code_children,$instance_variable,$lvar_derived_from_ivar)
-        look_for_form_for_action(code_children,$instance_variable)
-        look_for_render_call(code_children,$instance_variable)
-        look_for_form_tag_call(code_children, $instance_variable)
-        find_controllers(code_children)
+    if is_still_a_node(code)
+      look_for_instance_variable(code)
+      look_for_loop_argument(code)
+      code.children.each do |code_children|
+        if is_still_a_node(code_children)
+          look_for_link_to_calls(code_children)
+          look_for_submit_calls(code_children, $instance_variable)
+          look_for_auto_gen_methods(code_children,$instance_variable,$lvar_derived_from_ivar)
+          look_for_form_for_action(code_children,$instance_variable)
+          look_for_render_call(code_children,$instance_variable)
+          look_for_form_tag_call(code_children, $instance_variable)
+          find_controllers(code_children)
+        end
       end
+      $output_array
+    else
+      $output_array
     end
-    $output_array
   end
 
   def insert_outputs_on_array(name, receiver)
