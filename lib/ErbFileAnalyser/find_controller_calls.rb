@@ -25,6 +25,7 @@ class Find_controller_calls
   $render = :render
   $form_tag = :form_tag
   $pair = :pair
+  $empty_array = :[]
 
   def find_controllers(code)
     if is_still_a_node(code)
@@ -74,10 +75,9 @@ def look_for_link_to_calls(code)
             if method_inside_link_to_param.type == $pair
               method_inside_link_to_param = code.children[3].children[1].children[1].children[0]
               controller_name = code.children[3].children[0].children[1].children[0]
-              puts method_inside_link_to_param
             end
           end
-          insert_outputs_on_array(method_inside_link_to_param, Transform_into.singular(controller_name))
+          insert_outputs_on_array(method_inside_link_to_param, Transform_into.singular(controller_name.to_s))
         end
       end
     end
@@ -116,7 +116,9 @@ def look_for_auto_gen_methods(code, instance_variable,lvar_derived_from_ivar)
     if variable_type == $lvar && variable_calls_method
       method_argument = code.children[0].children[0]
       if method_argument == lvar_derived_from_ivar
-        insert_outputs_on_array(method_name, instance_variable)
+        if method_name != $empty_array
+          insert_outputs_on_array(method_name, instance_variable)
+        end
       end
     end
   end
