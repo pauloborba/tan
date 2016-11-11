@@ -6,6 +6,12 @@ Ruby version : 2.3.1
 Run it by: (don't forget to bundle install!)
   ruby -r "./Grab_controller_from_erb_file.rb" -e "ControllerGrabber.grab_controllers
   'your_directory/you_erb_file_name'"
+  or
+  gem install 'erb_dependencies'
+  
+  require_relative 'lib/erb_dependencies'
+  
+  possible_controller_calls = Erb_dependencies.new.grab_controllers(file_path)
   
 Architecture:
   
