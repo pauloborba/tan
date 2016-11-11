@@ -1,6 +1,6 @@
 require 'rspec'
-require_relative '../../ErbFileAnalyser/Erb_tags_remover'
-require_relative '../../Util/ruby_parser'
+require_relative '../../lib/ErbFileAnalyser/Erb_tags_remover'
+require_relative '../../lib/Util/ruby_parser'
 
 describe 'Erb tags removal function' do
     it 'does not break for the files in the samples directory' do
