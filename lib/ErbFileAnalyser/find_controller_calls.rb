@@ -116,7 +116,7 @@ def look_for_auto_gen_methods(code, instance_variable,lvar_derived_from_ivar)
     if variable_type == $lvar && variable_calls_method
       method_argument = code.children[0].children[0]
       if method_argument == lvar_derived_from_ivar
-        if method_name != $empty_array
+        if method_name != $empty_array && method_name.class != Parser::AST::Node
           insert_outputs_on_array(method_name, instance_variable)
         end
       end
