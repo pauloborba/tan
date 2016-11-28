@@ -8,6 +8,8 @@ class Find_controller_calls
     $output_array = array
     $instance_variable = instanceVar
     $lvar_derived_from_ivar = localVar
+    $button_label = ''
+    $submit_name = ''
   end
 
   $link_to = :link_to
@@ -26,19 +28,24 @@ class Find_controller_calls
   $form_tag = :form_tag
   $pair = :pair
   $empty_array = :[]
+  $semantic_form_for = :semantic_form_for
+  $buttons = :buttons
+  $array = :array
 
   def find_controllers(code)
     if is_still_a_node(code)
       look_for_instance_variable(code)
       look_for_loop_argument(code)
+      look_for_button_methods(code)
       code.children.each do |code_children|
         if is_still_a_node(code_children)
           look_for_link_to_calls(code_children)
+          look_for_form_for_action(code_children,$instance_variable)
           look_for_submit_calls(code_children, $instance_variable)
           look_for_auto_gen_methods(code_children,$instance_variable,$lvar_derived_from_ivar)
-          look_for_form_for_action(code_children,$instance_variable)
           look_for_render_call(code_children,$instance_variable)
           look_for_form_tag_call(code_children, $instance_variable)
+          look_for_semantic_form_for(code_children,$button_label)
           find_controllers(code_children)
         end
       end
@@ -48,10 +55,11 @@ class Find_controller_calls
     end
   end
 
-  def insert_outputs_on_array(name, receiver)
+  def insert_outputs_on_array(name, receiver, label)
     output_model = Output_model.new
     output_model.name = name
     output_model.receiver = receiver
+    output_model.label = label
     $output_array.push output_model
   end
 
@@ -66,7 +74,7 @@ def look_for_link_to_calls(code)
       method_argument_type = code.children[3].type
       if method_argument_type == $ivar || method_argument_type == $lvar
         method_argument_value = code.children[3].children[0]
-        insert_outputs_on_array(Transform_into.var_into_method(method_argument_value), "")
+        insert_outputs_on_array(Transform_into.var_into_method(method_argument_value), "",'')
       else
         method_inside_link_to_has_params = code.children[3].children[1].nil?
         if !method_inside_link_to_has_params
@@ -77,7 +85,7 @@ def look_for_link_to_calls(code)
               controller_name = code.children[3].children[0].children[1].children[0]
             end
           end
-          insert_outputs_on_array(method_inside_link_to_param, Transform_into.singular(controller_name.to_s))
+          insert_outputs_on_array(method_inside_link_to_param, Transform_into.singular(controller_name.to_s),'')
         end
       end
     end
@@ -95,7 +103,11 @@ def look_for_submit_calls(code, instance_variable)
         method_argument = code.children[3].children[0].children[1].children[0]
       end
     end
-    insert_outputs_on_array("#{method_argument}".downcase,Transform_into.var_into_controller(instance_variable))
+    if instance_variable == ''
+      insert_outputs_on_array(Transform_into.var_into_method($submit_name),'' ,"#{method_argument}".downcase)
+    else
+      insert_outputs_on_array("#{method_argument}".downcase,Transform_into.var_into_controller(instance_variable),'')
+    end
   end
 end
 
@@ -105,9 +117,9 @@ def look_for_auto_gen_methods(code, instance_variable,lvar_derived_from_ivar)
     method_argument_value = code.children[2].children[0]
     if method_argument_value.is_a?(Parser::AST::Node)
       method_argument_value = code.children[2].children[0].children[0].children[2].children[0]
-      insert_outputs_on_array(method_argument_value, instance_variable)
+      insert_outputs_on_array(method_argument_value, instance_variable,'')
     else
-      insert_outputs_on_array(method_argument_value, instance_variable)
+      insert_outputs_on_array(method_argument_value, instance_variable,'')
     end
   end
   if is_still_a_node(code.children[0])
@@ -117,7 +129,7 @@ def look_for_auto_gen_methods(code, instance_variable,lvar_derived_from_ivar)
       method_argument = code.children[0].children[0]
       if method_argument == lvar_derived_from_ivar
         if method_name != $empty_array && method_name.class != Parser::AST::Node
-          insert_outputs_on_array(method_name, instance_variable)
+          insert_outputs_on_array(method_name, instance_variable,'')
         end
       end
     end
@@ -156,7 +168,7 @@ def look_for_instance_variable(code)
         elsif  loop_type == $each
           loop_variable_value = code_children.children[0].children[0]
           if loop_variable_value.to_s[0] == '@'
-              $instance_variable = loop_variable_value
+            $instance_variable = loop_variable_value
           end
         end
         look_for_instance_variable(code_children)
@@ -175,7 +187,7 @@ def look_for_confirm_call(code)
     if link_to_type == $hash && has_confirm_call == $confirm
       link_to_redirect_name = code.children[2].children[0]
       link_to_argument_variable = code.children[3].children[0]
-      insert_outputs_on_array("#{link_to_redirect_name}".downcase,Transform_into.var_into_controller(link_to_argument_variable))
+      insert_outputs_on_array("#{link_to_redirect_name}".downcase,Transform_into.var_into_controller(link_to_argument_variable),'')
       true
     end
   else
@@ -189,6 +201,15 @@ def look_for_form_for_action(code, instance_variable)
       loop_type = code.children[1]
       if loop_type == $form_for
         has_hash = !code.children[3].nil?
+        has_array = !code.children[2].nil?
+        if has_array
+          possible_array = code.children[2].type
+          if possible_array == $array
+            name_part_1 = code.children[2].children[0].children[0]
+            name_part_2 = code.children[2].children[1].children[0]
+            $submit_name = name_part_1.to_s << '_' << (name_part_2.to_s)[1..-1]
+          end
+        end
         if has_hash
           hash_implementation1 = code.children[3].children[1].nil?
           if hash_implementation1
@@ -202,18 +223,38 @@ def look_for_form_for_action(code, instance_variable)
               loop_action = code.children[3].children[1].children[1].children[1].children[1].children[0]
             end
           end
-          insert_outputs_on_array(loop_action, instance_variable)
+          if !loop_action == '' || !instance_variable == ''
+            insert_outputs_on_array(loop_action, instance_variable,'')
+          end
         end
       end
     end
   end
 end
 
+
+def look_for_semantic_form_for(code, label)
+  loop_url = ''
+  if is_still_a_node(code)
+    if code.type == $send
+      loop_type = code.children[1]
+      if loop_type == $semantic_form_for
+        possible_hash = code.children[3].type
+        if possible_hash == $hash
+          loop_url = code.children[3].children[0].children[1].children[1]
+          insert_outputs_on_array(loop_url.to_s,'',label)
+        end
+      end
+    end
+  end
+end
+
+
 def look_for_render_call(code, instance_variable)
   method_name = code.children[1]
   if method_name == $render
     method_argument = code.children[2].children[0]
-    insert_outputs_on_array(method_argument, instance_variable)
+    insert_outputs_on_array(Transform_into.name_with_extension(method_argument), instance_variable,'')
   end
 end
 
@@ -224,12 +265,34 @@ def look_for_form_tag_call(code, instance_variable)
     if possible_hash == $hash
       method_argument = code.children[2].children[1].children[1].children[0]
       controller_called = code.children[2].children[0].children[1].children[0]
-      insert_outputs_on_array(method_argument, controller_called)
+      insert_outputs_on_array(method_argument, controller_called,'')
     else
       method_argument = code.children[2].children[1]
-      insert_outputs_on_array(method_argument, instance_variable)
+      insert_outputs_on_array(method_argument, instance_variable,'')
     end
 
+  end
+end
+
+def look_for_button_methods(code)
+  if $button_label == ''
+    code.children.each do |code_children|
+      if is_still_a_node code_children
+        attribute_and_method = code_children.children[0]
+        if is_still_a_node attribute_and_method
+          method_name = attribute_and_method.children[1]
+          if method_name == $buttons
+            possible_hash = code_children.children[2].children[2]
+            if possible_hash.type == $hash
+              $button_label = possible_hash.children[0].children[1].children[0]
+            end
+          end
+        end
+        look_for_button_methods(code_children)
+      end
+    end
+  else
+    $button_label
   end
 end
 

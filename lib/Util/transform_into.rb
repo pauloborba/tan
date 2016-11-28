@@ -26,4 +26,14 @@ class Transform_into
     var.singularize
   end
 
+  def self.name_with_extension(var)
+    var = var << '.html.haml'
+    if var !~ /\//
+      var = '_' << var
+    else
+      var = var.gsub(/(\/)(?!.*\/)/, "/_");
+    end
+    var
+  end
+
 end

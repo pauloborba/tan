@@ -40,7 +40,7 @@ class Haml_end_adder
       end
     end
     put_end_on_lines($lines_that_needs_end, $end_indentation_values)
-    puts $lines_array.join("\n")
+    $lines_array.join("\n")
   end
 
   def put_end_on_lines(lines_number, indentation_values)
