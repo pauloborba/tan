@@ -1,9 +1,10 @@
-
+#Call haml_end_adder on the input file, then calls haml_parser to parse the code into ruby, parses the ruby code with ruby_parser
+# then calls method_controller_visitor to get all calls to possible controllers and outputs them in a string
 class Grab_controller_from_haml_file
 
   require_relative '../../lib/HamlFileAnalyser/Haml_end_adder'
   require_relative '../../lib/ErbFileAnalyser/find_controller_calls'
-  require_relative '../HamlFileAnalyser/haml_parser'
+  require_relative '../../lib/HamlFileAnalyser/Haml_parser'
   require_relative '../Util/file_manager'
   require_relative '../Util/output_model'
   require_relative '../../lib/Util/ruby_parser'
@@ -17,6 +18,6 @@ class Grab_controller_from_haml_file
     output_array.each do |output|
       output_value = output_value + "[name: '#{output.name}', receiver: '#{output.receiver}', label: '#{output.label}']\n"
     end
-    puts output_value
+    output_value
   end
 end
