@@ -1,0 +1,7 @@
+[name: '_sysadmin.html.haml', receiver: '', label: '']
+[name: 'dashboard/_requests.html.haml', receiver: '', label: '']
+[name: '_activity_manager.html.haml', receiver: '', label: '']
+[name: '_reporter.html.haml', receiver: '', label: '']
+[name: '_district_manager.html.haml', receiver: '', label: '']
+[name: '_documents.html.haml', receiver: '', label: '']
+[name: 'comments/_short_listing.html.haml', receiver: '', label: '']
