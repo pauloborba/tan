@@ -4,7 +4,7 @@
 class ControllerGrabber
 
   require_relative '../ErbFileAnalyser/Erb_tags_remover'
-  require_relative '../ErbFileAnalyser/find_controller_calls'
+  require_relative '../../lib/Analyser/find_controller_calls'
   require_relative '../Util/file_manager'
   require_relative '../Util/ruby_parser'
   require_relative '../Util/output_model'

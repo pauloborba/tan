@@ -9,9 +9,10 @@ describe 'Haml parser function' do
     hard_path = __dir__
     path = (hard_path.scan(/.*(?=\/)/)[0])[0..-6]
     i = 1
-    while i < 9 do
+    files = Dir["#{path}/**/*.haml"]
+    files.each do |file_name|
       haml_end_adder = Haml_end_adder.new([])
-      unparsed_code = haml_end_adder.add_ends("#{path}/samples/sample#{i}.html.haml")
+      unparsed_code = haml_end_adder.add_ends(file_name)
       i += 1
       begin
         haml_parser = Haml_parser.new

@@ -117,8 +117,9 @@ def look_for_auto_gen_methods(code, instance_variable,lvar_derived_from_ivar)
     method_argument_value = code.children[2].children[0]
     if method_argument_value.is_a?(Parser::AST::Node)
       method_argument_value = code.children[2].children[0].children[0].children[2].children[0]
-      insert_outputs_on_array(method_argument_value, instance_variable,'')
-    else
+    end
+    if instance_variable != '' || (method_argument_value.include?('/') || method_argument_value.include?('_path'))
+      puts '1'
       insert_outputs_on_array(method_argument_value, instance_variable,'')
     end
   end
@@ -129,7 +130,9 @@ def look_for_auto_gen_methods(code, instance_variable,lvar_derived_from_ivar)
       method_argument = code.children[0].children[0]
       if method_argument == lvar_derived_from_ivar
         if method_name != $empty_array && method_name.class != Parser::AST::Node
-          insert_outputs_on_array(method_name, instance_variable,'')
+          if instance_variable != '' || ((method_name.to_s).include?('/') || (method_name.to_s).include?('_path'))
+            insert_outputs_on_array(method_name, instance_variable,'')
+          end
         end
       end
     end
@@ -252,8 +255,20 @@ end
 
 def look_for_render_call(code, instance_variable)
   method_name = code.children[1]
+  has_hash = false
+  if !code.children[2].nil?
+    if is_still_a_node code.children[2]
+      if code.children[2].type == $hash
+        has_hash = true
+      end
+    end
+  end
   if method_name == $render
-    method_argument = code.children[2].children[0]
+    if has_hash
+      method_argument = code.children[2].children[0].children[1].children[0]
+    else
+      method_argument = code.children[2].children[0]
+    end
     insert_outputs_on_array(Transform_into.name_with_extension(method_argument), instance_variable,'')
   end
 end

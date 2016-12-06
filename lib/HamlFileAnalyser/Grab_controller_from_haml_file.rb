@@ -3,7 +3,7 @@
 class Grab_controller_from_haml_file
 
   require_relative '../../lib/HamlFileAnalyser/Haml_end_adder'
-  require_relative '../../lib/ErbFileAnalyser/find_controller_calls'
+  require_relative '../../lib/Analyser/find_controller_calls'
   require_relative '../../lib/HamlFileAnalyser/Haml_parser'
   require_relative '../Util/file_manager'
   require_relative '../Util/output_model'
