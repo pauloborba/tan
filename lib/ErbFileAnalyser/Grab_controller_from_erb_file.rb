@@ -16,7 +16,7 @@ class ControllerGrabber
     file_text = file_manager.read_file(file_path)
     code = ErbTagsRemover.new.remove_erb_tags(file_text)
     parsed_code = Ruby_parser.new.parse_code(code)
-    output_array = Find_controller_calls.new([],'','').find_controllers(parsed_code)
+    output_array = Find_controller_calls.new([],'','','erb').find_controllers(parsed_code)
     output_array.each do |output|
       output_value = output_value + "[name: '#{output.name}', receiver: '#{output.receiver}']\n"
     end

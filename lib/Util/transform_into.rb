@@ -26,8 +26,8 @@ class Transform_into
     var.singularize
   end
 
-  def self.name_with_extension(var)
-    var = var << '.html.haml'
+  def self.name_with_extension(var, language)
+    var = var << ".html.#{language}"
     if var !~ /\//
       var = '_' << var
     else
