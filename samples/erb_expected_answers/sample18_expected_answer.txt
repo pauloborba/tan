@@ -1,0 +1,6 @@
+[name: 'uuid', receiver: '@otrunk_view_entry']
+[name: 'otml_import_id', receiver: '@otrunk_view_entry']
+[name: 'classname', receiver: '@otrunk_view_entry']
+[name: 'fq_classname', receiver: '@otrunk_view_entry']
+[name: 'create', receiver: '@otrunk_view_entries_controller']
+[name: 'otrunk_view_entries_path', receiver: '']

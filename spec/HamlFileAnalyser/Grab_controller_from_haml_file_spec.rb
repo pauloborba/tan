@@ -1,5 +1,5 @@
 require 'rspec'
-require_relative '../../lib/HamlFileAnalyser/Grab_controller_from_haml_file'
+require_relative '../../lib/HamlFileAnalyser/Haml_controller_extractor'
 
 describe 'Extraction of dependencies in haml files, including calls to controller actions' do
   it 'does produce correct mappings for the files in the samples directory' do
@@ -7,11 +7,11 @@ describe 'Extraction of dependencies in haml files, including calls to controlle
     i = 1
     $passed = true
     file_manager = File_manager.new
-    while i < 4 do
-      grab_controller_from_haml_file = Grab_controller_from_haml_file.new
+    while i < 9 do
+      controller_extractor = HamlControllerExtractor.new
       sample_path = "#{path}/samples/sample#{i}.html.haml"
-      answer_string = file_manager.read_file("#{path}/samples/sample#{i}_haml_expected_answer.txt").gsub(/\s+/, "")
-      tool_answer = grab_controller_from_haml_file.controller_grabber(sample_path).gsub(/\s+/, "")
+      answer_string = file_manager.read_file("#{path}/samples/haml_expected_answers/sample#{i}_haml_expected_answer.txt").gsub(/\s+/, "")
+      tool_answer = controller_extractor.haml_controller_extractor(sample_path).gsub(/\s+/, "")
       i += 1
       if !(answer_string == tool_answer)
         $passed = false

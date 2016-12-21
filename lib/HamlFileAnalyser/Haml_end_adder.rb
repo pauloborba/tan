@@ -10,63 +10,44 @@ class Haml_end_adder
 
   def add_ends(file_path)
     fill_array(file_path)
-    has_need_for_end = /(?=( do$| do +| if |-if | if\(|-if\(| begin| case| unless |-unless | unless\())/
-    haml_conditional = /(?<=\-)([A-Za-z0-9]| |@|\[)|(?<=\=)(.* do)/
-    special_conditions = /(?<=\= )(.*) if |^ +- \S.* if |\S+ *-.* if |(?<=\- )next if |(?<=\= )(.*)unless|(?<=\- )(.+)unless|".*-.*"(.+)unless| *(=|-) ([A-Za-r0-9]|").*= .* do /
-    ignore_special_condition = /^ *=.* do$|^ *= f\..* do \|f\|/
-    javascript_if = /(?<=if)( *)\(.*\)\{|(?<=if)( *)\(.*\)/
-    javascript_keyword = /:javascript/
-    javascript_tag = /javascript_include_tag/
-    commentary = /\/( *)\- *(.*)(?= \/).*| *\/ +.*|(^ +#.*|^ *- *#.*)|(^ *\/\/ *- .*)|^ *\/- *.*/
-    do_inside_string_block = /".* do"|".* do +.*?"/
     has_javascript_on_code = false
     end_of_javascript_block = 0
     File.foreach(file_path).with_index do |line, line_num|
-      if end_of_javascript_block <= line_num
-        has_javascript_on_code = false
-      else
-        line  = ''
-        $lines_array[line_num] = line
-      end
-      if javascript_tag.match(line)
-        line = ''
-        $lines_array[line_num] = ''
-      elsif javascript_keyword.match(line)
-        indentation = check_indentation_value(line)
-        line = change_line_to_conditional(indentation)
-        $lines_array[line_num] = line
-        has_javascript_on_code = true
-      end
-      matches_js_if = false
-      if javascript_if.match(line) && has_javascript_on_code
-        matches_js_if = true
-      end
-      comment = commentary.match(line)
+      response_array = check_for_javascript_code(end_of_javascript_block, line_num, line, has_javascript_on_code)
+      matches_js_if = response_array[0]
+      has_javascript_on_code = response_array[1]
+      line = response_array[2]
+      comment = check_regex_match('commentary', line)
       not_a_comment = comment.nil?
-      matches_do_inside_quote_marks = do_inside_string_block.match(line)
+      matches_do_inside_quote_marks = check_regex_match('do_inside_string_block', line)
       if not_a_comment && !matches_js_if && !matches_do_inside_quote_marks
-        if has_need_for_end.match(line) && haml_conditional.match(line) &&
-            (!special_conditions.match(line) || ignore_special_condition.match(line))
-          indentation_value = check_indentation_value(line)
-          next_indentations_values = look_into_next_lines($lines_array,line_num)
-          position_plus_taken_care = find_end_position(next_indentations_values,line_num, indentation_value)
-          end_was_taken_care = position_plus_taken_care[1]
-          if has_javascript_on_code
-            if end_was_taken_care
-            end_of_javascript_block = position_plus_taken_care[0]
-            else
-              end_of_javascript_block = $lines_array.size
-            end
-          end
-          if !end_was_taken_care
-            $end_indentation_values.push(indentation_value)
-            $lines_that_needs_end.push($lines_array.size)
-          end
+        if check_regex_match('has_need_for_end', line) && check_regex_match('haml_conditional', line) &&
+            (!check_regex_match('special_conditions', line) || check_regex_match('ignore_special_condition', line))
+          end_of_javascript_block = check_and_save_end_position(line, line_num, has_javascript_on_code, end_of_javascript_block)
         end
       end
     end
     put_end_on_lines($lines_that_needs_end, $end_indentation_values)
     $lines_array.join("\n")
+  end
+
+  def check_and_save_end_position(line, line_num, has_javascript_on_code, end_of_javascript_block)
+    indentation_value = check_indentation_value(line)
+    next_indentations_values = look_into_next_lines($lines_array,line_num)
+    position_plus_taken_care = find_end_position(next_indentations_values,line_num, indentation_value)
+    end_was_taken_care = position_plus_taken_care[1]
+    if has_javascript_on_code
+      if end_was_taken_care
+        end_of_javascript_block = position_plus_taken_care[0]
+      else
+        end_of_javascript_block = $lines_array.size
+      end
+    end
+    if !end_was_taken_care
+      $end_indentation_values.push(indentation_value)
+      $lines_that_needs_end.push($lines_array.size)
+    end
+    end_of_javascript_block
   end
 
   def find_end_position(next_indentations_values,line_num, indentation_value)
@@ -222,5 +203,66 @@ class Haml_end_adder
     end
     helper_lines_array
   end
+
+  def check_for_javascript_code(end_of_javascript_block, line_num, line, has_javascript_on_code)
+    if end_of_javascript_block <= line_num
+      has_javascript_on_code = false
+    else
+      line  = ''
+      $lines_array[line_num] = line
+    end
+    if check_regex_match('javascript_tag',line)
+      line = ''
+      $lines_array[line_num] = ''
+    elsif check_regex_match('javascript_keyword', line)
+      indentation = check_indentation_value(line)
+      line = change_line_to_conditional(indentation)
+      $lines_array[line_num] = line
+      has_javascript_on_code = true
+    end
+    matches_js_if = false
+    if check_regex_match('javascript_if', line) && has_javascript_on_code
+      matches_js_if = true
+    end
+    [matches_js_if, has_javascript_on_code, line]
+  end
+
+  def check_regex_match(regex_name, string)
+    response = false
+    has_need_for_end = /(?=( do$| do +| if |-if | if\(|-if\(| begin| case| unless |-unless | unless\())/
+    haml_conditional = /(?<=\-)([A-Za-z0-9]| |@|\[)|(?<=\=)(.* do)/
+    special_conditions = /(?<=\= )(.*) if |^ +- \S.* if |\S+ *-.* if |(?<=\- )next if |(?<=\= )(.*)unless|(?<=\- )(.+)unless|".*-.*"(.+)unless| *(=|-) ([A-Za-r0-9]|").*= .* do /
+    ignore_special_condition = /^ *=.* do$|^ *= f\..* do \|f\|/
+    javascript_if = /(?<=if)( *)\(.*\)\{|(?<=if)( *)\(.*\)/
+    javascript_keyword = /:javascript/
+    javascript_tag = /javascript_include_tag/
+    commentary = /\/( *)\- *(.*)(?= \/).*| *\/ +.*|(^ +#.*|^ *- *#.*)|(^ *\/\/ *- .*)|^ *\/- *.*/
+    do_inside_string_block = /".* do"|".* do +.*?"/
+
+    case regex_name
+      when 'has_need_for_end'
+        response = has_need_for_end.match string
+      when 'haml_conditional'
+        response = haml_conditional.match string
+      when 'special_conditions'
+        response = special_conditions.match string
+      when 'ignore_special_condition'
+        response = ignore_special_condition.match string
+      when 'javascript_if'
+        response = javascript_if.match string
+      when 'javascript_keyword'
+        response = javascript_keyword.match string
+      when 'javascript_tag'
+        response = javascript_tag.match string
+      when 'commentary'
+        response = commentary.match string
+      when 'do_inside_string_block'
+        response = do_inside_string_block.match string
+      else
+        response
+    end
+    response
+  end
+
 
 end

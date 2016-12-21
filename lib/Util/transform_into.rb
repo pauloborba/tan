@@ -1,11 +1,10 @@
+#Util class that modifies string in order to correctly name them after their respective method/controller call
 require 'active_support/inflector'
 
 class Transform_into
 
   def self.var_into_controller(var)
-    if var == ''
-
-    else
+    if var != ''
       if var[-1] == 'y'
         var = "#{var[0...-1]}ies_controller"
       else

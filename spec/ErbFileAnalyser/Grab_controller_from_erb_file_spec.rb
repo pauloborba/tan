@@ -1,6 +1,6 @@
 require 'rspec'
 require_relative '../../lib/Util/file_manager'
-require_relative '../../lib/ErbFileAnalyser/Grab_controller_from_erb_file'
+require_relative '../../lib/ErbFileAnalyser/Erb_controller_extractor'
 
 describe "Extraction of dependencies in erb files, including calls to controller actions" do
   it "does produce correct mappings for the files in the samples directory" do
@@ -8,11 +8,11 @@ describe "Extraction of dependencies in erb files, including calls to controller
     i = 1
     $passed = true
     file_manager = File_manager.new
-    while i < 5 do
-      controller_grabber = ControllerGrabber.new
+    while i < 24 do
+      controller_extractor = ErbControllerExtractor.new
       sample_path = "#{path}/samples/sample#{i}.html.erb"
-      answer_string = file_manager.read_file("#{path}/samples/sample#{i}_expected_answer.txt").gsub(/\s+/, "")
-      tool_answer = controller_grabber.grab_controllers(sample_path).gsub(/\s+/, "")
+      answer_string = file_manager.read_file("#{path}/samples/erb_expected_answers/sample#{i}_expected_answer.txt").gsub(/\s+/, "")
+      tool_answer = controller_extractor.erb_controller_extractor(sample_path).gsub(/\s+/, "")
       i += 1
       if !(answer_string == tool_answer)
         $passed = false

@@ -5,15 +5,14 @@ require_relative '../../lib/Util/ruby_parser'
 describe 'Erb tags removal function' do
     it 'does not break for the files in the samples directory' do
       $a = true
-      hard_path = __FILE__
-      path = hard_path.scan(/.*(?=\/)/)
-      i = 1
+      hard_path = __dir__
+      path = (hard_path.scan(/.*(?=\/)/)[0])[0..-6]
+      files = Dir["#{path}/**/*.erb"]
+      ruby_parser = Ruby_parser.new
       erb_tags_remover = ErbTagsRemover.new
-      while i < 20 do
-        untagged_code = erb_tags_remover.remove_erb_tags("#{path}/samples/sample#{i}.html.erb")
-        i += 1
+      files.each do |file_name|
         begin
-          ruby_parser = Ruby_parser.new
+          untagged_code = erb_tags_remover.remove_erb_tags(file_name)
           ruby_parser.parse_code(untagged_code)
         rescue
           $a = false

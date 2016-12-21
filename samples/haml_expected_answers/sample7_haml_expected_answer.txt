@@ -1,0 +1,8 @@
+[name: 'allocations', receiver: '@user', label: '']
+[name: 'id', receiver: '@user', label: '']
+[name: 'name', receiver: '@user', label: '']
+[name: 'cpf', receiver: '@user', label: '']
+[name: 'email', receiver: '@user', label: '']
+[name: 'id', receiver: '@user', label: '']
+[name: 'name', receiver: '@user', label: '']
+[name: 'id', receiver: '@user', label: '']

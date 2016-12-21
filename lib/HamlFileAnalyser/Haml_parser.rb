@@ -12,20 +12,9 @@ class Haml_parser
       tagged_chunks.each do |tagged_chunk|
         if tagged_chunk.class == String
           if /[A-Za-z0-9]| |@|\[/ === tagged_chunk[0]
-            conditionals_regex = /(?=( do$| do |if |if\(|begin$|case|unless))|(?=(else|elsif|rescue$|ensure|end$|when))/
             possible_code = ''
             test_code = tagged_chunk
-            if conditionals_regex === tagged_chunk
-              special_conditionals = [/end$/,/else$/,/elsif/,/rescue$/,/ensure/,/when/,/case/]
-              special_conditionals.each do |special_conditional|
-                if special_conditional === tagged_chunk
-                  test_code = 'a = true'
-                  break
-                else
-                  test_code = "#{tagged_chunk}" + "\n end"
-                end
-              end
-            end
+            test_code = check_special_conditionals(tagged_chunk, test_code)
             begin
               possible_code = ruby_parser.parse_code(test_code)
             rescue
@@ -40,6 +29,22 @@ class Haml_parser
       end
     end
     helper_array.join("\n")
+  end
+
+  def check_special_conditionals(tagged_chunk, test_code)
+    conditionals_regex = /(?=( do$| do |if |if\(|begin$|case|unless))|(?=(else|elsif|rescue$|ensure|end$|when))/
+    if conditionals_regex === tagged_chunk
+      special_conditionals = [/end$/,/else$/,/elsif/,/rescue$/,/ensure/,/when/,/case/]
+      special_conditionals.each do |special_conditional|
+        if special_conditional === tagged_chunk
+          test_code = 'a = true'
+          break
+        else
+          test_code = "#{tagged_chunk}" + "\n end"
+        end
+      end
+    end
+    test_code
   end
 
   def remove_commented_lines(text)

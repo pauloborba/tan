@@ -51,10 +51,8 @@ class Find_controller_calls
           find_controllers(code_children)
         end
       end
-      $output_array
-    else
-      $output_array
     end
+    $output_array
   end
 
   def insert_outputs_on_array(name, receiver, label)
@@ -362,9 +360,5 @@ def look_for_button_methods(code)
 end
 
 def is_still_a_node(code)
-  if code.is_a?(Parser::AST::Node)
-    true
-  else
-    false
-  end
+  code.is_a?(Parser::AST::Node)
 end

@@ -1,16 +1,16 @@
-require_relative 'ErbFileAnalyser/Grab_controller_from_erb_file'
-require_relative '../lib/HamlFileAnalyser/Grab_controller_from_haml_file'
+require_relative 'ErbFileAnalyser/Erb_controller_extractor'
+require_relative '../lib/HamlFileAnalyser/Haml_controller_extractor'
 class TaskAnalyser
 
   def grab_controllers(file_path)
     extension = get_file_extension(file_path)
     case extension.downcase
       when 'erb'
-        puts ControllerGrabber.new.grab_controllers(file_path)
+        puts ErbControllerExtractor.new.erb_controller_extractor(file_path)
       when 'haml'
-        puts Grab_controller_from_haml_file.new.controller_grabber(file_path)
+        puts HamlControllerExtractor.new.haml_controller_extractor(file_path)
       else
-
+        raise 'This file extension is not currently supported'
     end
   end
 

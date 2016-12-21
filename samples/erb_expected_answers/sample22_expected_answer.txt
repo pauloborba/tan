@@ -1,0 +1,6 @@
+[name: 'new_session_path', receiver: '']
+[name: 'new_registration_path', receiver: '']
+[name: 'new_password_path', receiver: '']
+[name: 'new_confirmation_path', receiver: '']
+[name: 'new_unlock_path', receiver: '']
+[name: 'omniauth_authorize_path', receiver: '']

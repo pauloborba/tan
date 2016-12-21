@@ -1,5 +1,5 @@
 require 'rspec'
-require_relative '../../lib/HamlFileAnalyser/Grab_controller_from_haml_file'
+require_relative '../../lib/HamlFileAnalyser/Haml_controller_extractor'
 
 describe 'Extraction of dependencies in haml files, including calls to controller actions' do
 
@@ -22,8 +22,6 @@ describe 'Extraction of dependencies in haml files, including calls to controlle
         i += 1
       end
     end
-    puts error_array
-    puts i
     expect($a).to eq true
   end
 end
