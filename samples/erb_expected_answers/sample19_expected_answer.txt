@@ -1,0 +1,2 @@
+[name: 'edit_otrunk_view_entry_path', receiver: '']
+[name: 'otrunk_view_entries_path', receiver: '']

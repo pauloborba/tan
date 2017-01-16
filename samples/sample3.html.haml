@@ -1,0 +1,16 @@
+﻿= error_messages_for :document, :header_message  => nil, :message => "Oops, we couldn't save your changes."
+
+- form_for [:admin, @document], :builder => CustomFormBuilder, :html => {:class => 'basic_form js_form', :multipart => true} do |f|
+
+  %fieldset.inputs
+    %ol
+      %li.last
+        %h2 File Details
+        %ul.dashboard_section
+          = f.text_field :title, input_options('Title', "Title to identify the uploaded file")
+          = f.text_area :description, input_options('Description', nil, false).merge(:rows => 10)
+          = f.select :visibility, options_for_select(Document::VISIBILITY_OPTIONS.map{|o| [o.humanize, o]}, @document.visibility), input_options('Visibility')
+          = f.file_field :document, input_options('File', current_document_name(@document))
+  %fieldset.buttons
+    %ol
+      = f.submit "Save", :class => 'next update'

@@ -1,0 +1,25 @@
+%h1#lightBoxDialogTitle= t(".title")
+.block_content{style: "padding: 5px;"}
+  = form_for @assignment_file do |f|
+    = f.hidden_field :academic_allocation_user_id, value: @assignment_file.academic_allocation_user_id
+    = f.file_field :attachment
+    .block_content_gray{style: "padding: 5px;"}
+      %p=raw t(:send_file_obs)
+      %p=raw t(:send_file_text)
+    .right_buttons
+      = button_tag t(:save), class: "btn btn_main save_file", type: :button
+
+:javascript
+  $(function(){
+    $(".save_file").click(function(){
+      $('form#new_assignment_file').serialize_and_submit({
+        files: true,
+        prepend_to_list: $(".student_files tbody"),
+        complement_success: function(){
+          $.fancybox.close();
+          flash_message("Arquivo enviado com sucesso", "notice");
+          $(".assignment_to_be_sent").html("#{t(:sent)}").css("color","#2900C2");
+        }
+      });
+    });
+  });

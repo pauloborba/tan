@@ -1,0 +1,5 @@
+[name: 'uuid', receiver: '@otrunk_import']
+[name: 'classname', receiver: '@otrunk_import']
+[name: 'fq_classname', receiver: '@otrunk_import']
+[name: 'create', receiver: '@otrunk_imports_controller']
+[name: 'otrunk_imports_path', receiver: '']
